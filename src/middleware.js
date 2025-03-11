@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export { default } from "next-auth/middleware"
 
 export function middleware(request) {
   const pathname = request.nextUrl.pathname;
@@ -12,3 +13,5 @@ export function middleware(request) {
 
   return NextResponse.next();
 }
+
+export const config = { matcher: ["/dashboard/:path*"] }
