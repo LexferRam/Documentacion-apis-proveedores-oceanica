@@ -1,0 +1,103 @@
+/* Opcional: estiliza los enlaces */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.header-home-oceanica {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 80px;
+  background: #00a394;
+  z-index: 999;
+
+  -webkit-box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
+  -moz-box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
+  box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
+}
+
+.header-home-piramide {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 80px;
+    background: white;
+    z-index: 999;
+  
+    -webkit-box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
+    -moz-box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
+    box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
+  }
+
+.image-logo-header {
+  width: 200px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+}
+
+.MuiTablePagination-root label {
+    color: white !important;
+}
+
+.MuiTablePagination-root div {
+    color: white !important;
+}
+
+.MuiTablePagination-root div {
+    color: white !important;
+}
+
+.MuiTablePagination-root span {
+    color: white !important;
+}
+
+.MuiTablePagination-root button {
+    color: white !important;
+}
+
+.MuiTablePagination-root svg {
+    color: white !important;
+}
+
+
+
+.MuiTableRow-head div {
+    color: white !important;
+}
+
+.MuiTableRow-head svg {
+    color: white !important;
+}
+
+.MuiTableRow-head button {
+    color: white !important;
+}
+
+.MuiTableRow-head span {
+    color: white !important;
+}
+
+.MuiTableRow-head path {
+    color: white !important;
+}
+
+.MuiTableRow-head input  {
+    color: white !important;
+}
+
+
+.MuiTableHead-root {
+    background-color: rgb(213, 213, 213);
+    color: white;
+}
+
+.button-download{
+    background: red;
+}
