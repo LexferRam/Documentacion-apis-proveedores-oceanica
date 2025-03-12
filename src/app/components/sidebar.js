@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemText, Divider, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
+const company = "PIRAMIDE";
+
 const Sidebar = () => {
   const [open, setOpen] = useState(true); // El menú está abierto por defecto
 
@@ -15,12 +17,17 @@ const Sidebar = () => {
     <>
       <IconButton
         edge="start"
-        color="inherit"
         aria-label="menu"
         onClick={toggleDrawer}
         style={{ position: 'fixed', top: '20px', left: '20px', zIndex: 1000 }}
       >
-        <MenuIcon />
+        <MenuIcon 
+       
+        style={{
+          color:company==="PIRAMIDE"?"inherit":"white"
+        }}
+        
+        />
       </IconButton>
 
       <Drawer
