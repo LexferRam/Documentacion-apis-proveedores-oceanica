@@ -1,10 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { getSession, SessionProvider } from "next-auth/react";
 import Providers from "@/context/Providers";
-import Header from "./components/header"
-import Sidebar from './components/sidebar';
-import { CssBaseline, AppBar, Toolbar, Typography } from '@mui/material';
+// import { getSession } from "@/utils/authOptions";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,22 +20,18 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const session = await getSession()
+  // const session = await getSession()
 
-  console.log("session:", session)
+  // console.log("session:", session)
 
   return (
 
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Header />
-        <CssBaseline />
-        <Header /> {/* Este es el encabezado */}
-        <Sidebar /> {/* Este es el menú lateral */}
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>         
         <main style={{ marginTop: '100px', marginLeft: '250px' }}>
-          <Providers session={session}>
+          {/* <Providers session={session}> */}
             {children}
-          </Providers>
+          {/* </Providers> */}
         </main>
       </body>
     </html>

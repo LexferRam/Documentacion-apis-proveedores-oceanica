@@ -1,8 +1,10 @@
 'use client'; // Marca el componente como del lado del cliente
 
 import React, { useState } from 'react';
-import { Drawer, List, ListItem, ListItemText, Divider, IconButton } from '@mui/material';
+import { Drawer, List, ListItem, ListItemText, Divider, IconButton, ListItemButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import Link from 'next/link';
+
 
 const company = "PIRAMIDE";
 
@@ -48,12 +50,16 @@ const Sidebar = () => {
         onClose={toggleDrawer} // Cierra el Drawer si el usuario hace clic fuera
       >
         <List>
-          <ListItem style={{cursor:"pointer"}} button>
+          {/* <ListItem style={{cursor:"pointer"}} button> */}
+          <ListItemButton component="a" href="/dashboard/solicitud">
             <ListItemText primary="Solicitudes" />
-          </ListItem>
-          <ListItem style={{cursor:"pointer"}} button>
+            </ListItemButton>
+          {/* </ListItem> */}
+          {/* <ListItem style={{cursor:"pointer"}} button> */}
+          <ListItemButton component="a" href="/dashboard/documentacion">
             <ListItemText primary="Documentación API" />
-          </ListItem>
+            </ListItemButton>
+          {/* </ListItem> */}
         </List>
         <Divider />
         {/* Puedes agregar más ítems en el menú */}

@@ -1,9 +1,13 @@
-import React from 'react'
+"use client";
+import React from "react";
+import Layout from "./layout.js";
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
-  )
-}
+    <>
+      <Layout />
+    </>
+  );
+};
 
-export default Dashboard
+export default Dashboard;
