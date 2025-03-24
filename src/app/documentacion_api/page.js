@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { signIn } from "next-auth/react";
 import {
   Container,
   Typography,
@@ -13,37 +12,33 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Lock } from "@mui/icons-material"; // Iconos de Material-UI
 import Image from "next/image";
 import PersonIcon from "@mui/icons-material/Person";
-
+import { login } from "./auth";
+import { IconButton } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const page = () => {
   const [p_portal_username, setP_portal_username] = useState("");
   const [p_pwd, setP_pwd] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   // const router = useRouter();
 
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("valor 1", p_portal_username);
-    console.log("valor 2", p_pwd);
-    // Llamada a NextAuth.js para autenticar
-    const result = await signIn("credentials", {
-      redirect: false,
-      p_portal_username,
-      p_pwd,
-      // redirectTo:'/dashboard',
-    });
-
-    console.log("ver valor provider ", result);
-
-    if (result.error) {
-      alert(result.error); // Muestra un mensaje de error si la autenticación falla
+    e.preventDefault(); // Llamada a NextAuth.js para autenticar
+    const result = await login(p_portal_username, p_pwd);
+    if (result.status === 400) {
+      alert("falla autenticacion"); // Muestra un mensaje de error si la autenticación falla
     } else {
       alert("entroo");
-      window.location.href = "/dashboard"; // Redirige al usuario a la página principal
+      sessionStorage.setItem("PROFILE_KEY", JSON.stringify(result.user));
+      window.location.href = "/dashboard/solicitud"; // Redirige al usuario a la página principal
     }
   };
 
@@ -71,16 +66,14 @@ const page = () => {
                   marginTop: -7,
                 }}
               >
-               
                 <Image
                   src="https://asesores.segurospiramide.com/static/logo-piramides-d07524ef35db8b8403dff1b54884e9aa.svg" // Ruta del logo (guárdalo en la carpeta public)
                   alt="Logo de la empresa"
                   width={200}
                   height={200}
                 />
-
               </Box>
-             
+
               <Box
                 component="form"
                 sx={{ marginTop: -7 }}
@@ -109,7 +102,7 @@ const page = () => {
                 <TextField
                   fullWidth
                   variant="standard"
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Cambia el tipo de input según el estado
                   value={p_pwd}
                   onChange={(e) => setP_pwd(e.target.value)}
                   margin="normal"
@@ -121,8 +114,19 @@ const page = () => {
                         <Lock />
                       </InputAdornment>
                     ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={handleClickShowPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
                   }}
                 />
+
                 {/* Botón de inicio de sesión */}
                 <Button
                   type="submit"

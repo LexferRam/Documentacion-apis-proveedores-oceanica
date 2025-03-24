@@ -19,7 +19,7 @@ a {
   box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
 }
 
-.header-home-piramide {
+/* .header-home-piramide {
     position: fixed;
     top: 0;
     left: 0;
@@ -32,15 +32,22 @@ a {
     -webkit-box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
     -moz-box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
     box-shadow: 0px 3px 5px 0px rgba(184, 184, 184, 1);
-  }
+  } */
 
-.image-logo-header {
+/* .image-logo-header {
   width: 200px;
   display: block;
   margin-left: auto;
   margin-right: auto;
   margin-top: 10px;
-}
+} */
+.image-logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+  }
+  
 
 .MuiTablePagination-root label {
     color: white !important;

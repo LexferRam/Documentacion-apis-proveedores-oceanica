@@ -8,7 +8,7 @@ export function middleware(request) {
 
   // Redirige a /login si la ruta es /
   if (pathname === '/') {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/documentacion_api', request.url));
   }
 
   return NextResponse.next();
