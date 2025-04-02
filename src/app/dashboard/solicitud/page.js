@@ -124,7 +124,14 @@ const Page = () => {
           c_solicitud: [],
           c_det_solicitud: [],
         });
+        setDataHistoricoSolicitudes(
+          response.data || {
+            c_solicitud: [],
+            c_det_solicitud: [],
+          }
+        );
         constDataHistorico();
+        constDataHistoricoSolicitudes();
         setChanges(prev => prev.filter(change => change.ID_SOLICITUD !== masterData.ID_SOLICITUD));
         alert('Actualización exitosa');
       } else {
@@ -283,8 +290,52 @@ const Page = () => {
     [selectedValues]
   );
 
+  const detailColumnsHistorico = useMemo(
+    () => [
+      {
+        accessorKey: "NOMBRE",
+        header: "Producto",
+        size: 200,
+      },
+
+      {
+        accessorKey: "ESTATUS",
+        header: "Estatus",
+        size: 100,
+        Cell: ({ cell }) => (
+          <span
+            style={{
+              color: cell.getValue() === "A" ? "green" : cell.getValue() === "P" ? "orange" : "red",
+              fontWeight: "bold",
+            }}
+          >
+            {cell.getValue() === "A" ? "Aprobado" : cell.getValue() === "P" ? "Pendiente" : "Rechazado"}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "URL",
+        header: "URL",
+        size: 300,
+        Cell: ({ cell }) => (
+          <a href={cell.getValue()} target="_blank" rel="noopener noreferrer">
+            {cell.getValue()}
+          </a>
+        ),
+      },
+ 
+    ],
+    []
+  );
+
+
   const columns = useMemo(
     () => [
+      {
+        accessorKey: "ID_SOLICITUD",
+        header: "Nro. Solcitud",
+        size: 120,
+      },
       {
         accessorKey: "FECHA",
         header: "Fecha",
@@ -352,6 +403,55 @@ const Page = () => {
     ],
     [changes]
   );
+
+
+  const columnsHistorico = useMemo(
+    () => [
+      {
+        accessorKey: "ID_SOLICITUD",
+        header: "Nro. Solcitud",
+        size: 120,
+      },
+      {
+        accessorKey: "FECHA",
+        header: "Fecha",
+        size: 120,
+      },
+      {
+        accessorKey: "CONTACTO",
+        header: "Contacto",
+        size: 180,
+      },
+      {
+        accessorKey: "EMAIL",
+        header: "Email",
+        size: 200,
+      },
+      {
+        accessorKey: "TELF_CONTACTO",
+        header: "Teléfono",
+        size: 120,
+      },
+      {
+        accessorKey: "ESTATUS",
+        header: "Estatus",
+        size: 100,
+        Cell: ({ cell }) => (
+          <span
+            style={{
+              color: cell.getValue() === "A" ? "green" : cell.getValue() === "P" ? "orange" : "red",
+              fontWeight: "bold",
+            }}
+          >
+            {cell.getValue() === "A" ? "Aprobado" : cell.getValue() === "P" ? "Pendiente" : "Rechazado"}
+          </span>
+        ),
+      },
+
+    ],
+    []
+  );
+
 
   const table = useMaterialReactTable({
     columns,
@@ -425,7 +525,7 @@ const Page = () => {
 
 
   const tableHistoricoSolicitudes = useMaterialReactTable({
-    columns,
+    columns: columnsHistorico,
     data: transformedDataHistorico,
     localization: MRT_Localization_ES,
     enableExpandAll: true,
@@ -449,7 +549,7 @@ const Page = () => {
           <table style={{ width: "100%", borderCollapse: "collapse", padding: "0px" }}>
             <thead>
               <tr style={{ backgroundColor: "#f5f5f5" }}>
-                {detailColumns.map((column) => (
+                {detailColumnsHistorico.map((column) => (
                   <th
                     key={column.accessorKey || column.header}
                     style={{
@@ -467,7 +567,7 @@ const Page = () => {
             <tbody>
               {detalles.map((detalle, index) => (
                 <tr key={index}>
-                  {detailColumns.map((column) => (
+                  {detailColumnsHistorico.map((column) => (
                     <td
                       key={column.accessorKey || column.header}
                       style={{

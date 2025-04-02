@@ -65,7 +65,17 @@ const page = () => {
       {
         accessorKey: "ESTATUS",
         header: "Estatus",
-        grow: false,
+        size: 100,
+        Cell: ({ cell }) => (
+          <span
+            style={{
+              color: cell.getValue() === "A" ? "green" : cell.getValue() === "P" ? "orange" : "red",
+              fontWeight: "bold",
+            }}
+          >
+            {cell.getValue() === "A" ? "Aprobado" : cell.getValue() === "P" ? "Pendiente" : "Rechazado"}
+          </span>
+        ),
       },
 
       {
@@ -76,7 +86,21 @@ const page = () => {
       {
         accessorKey: "URL",
         header: "URL",
-        grow: false,
+        size: 300,
+        Cell: ({ cell }) => (
+          <a 
+            href={cell.getValue()} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{
+              color: '#1976d2', // Color azul de Material-UI
+              textDecoration: 'underline', // Opcional: subrayado para indicar que es un enlace
+              cursor: 'pointer', // Cambia el cursor al pasar el mouse
+            }}
+          >
+            {cell.getValue()}
+          </a>
+        ),
       },
       // {
       //   accessorKey: "city",
