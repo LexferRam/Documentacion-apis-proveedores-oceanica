@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -22,37 +22,61 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
-import Axios from "axios"
+import Axios from "axios";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import AdvisorController from "./_component/AdvisorController";
-import { useForm } from "react-hook-form"
+import { useForm } from "react-hook-form";
 
+function useSessionStorage(key) {
+  const [value, setValue] = useState(null);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const item = sessionStorage.getItem(key);
+      if (item) {
+        setValue(JSON.parse(item));
+      }
+    }
+  }, [key]);
 
-
+  return value;
+}
 
 const page = () => {
-  const defaultValues ={
-    p_advisor_selected_0: ''
-  }
-  const methods = useForm({defaultValues})
-  const { handleSubmit, ...objForm } = methods
-  const [consultaApi, setConsultaApi] = useState([])
-  const index = 0
+  const profile = useSessionStorage("PROFILE_KEY");
+  const codigoPerfil = profile?.PROFILE_CODE;
 
+  console.log("VER VALR", codigoPerfil);
+
+  const defaultValues = {
+    p_advisor_selected_0: "",
+  };
+  const methods = useForm({ defaultValues });
+  const { handleSubmit, ...objForm } = methods;
+  const [consultaApi, setConsultaApi] = useState([]);
+  const index = 0;
 
   const handleBroker = async (value) => {
-
     const params = {
       p_cia: 1,
-      p_codinter: value,
-    }
-    const response = await Axios.post("https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitud_asesor", params)
-    setConsultaApi( response.data.c_det_solicitud )
-        console.log('VER VALOR DEFINITIVO', response.data.c_det_solicitud )
-   
-  }
+      p_codinter:
+        codigoPerfil === "insurance_broker"
+          ? profile.p_insurance_broker_code
+          : value,
+    };
+    const response = await Axios.post(
+      "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitud_asesor",
+      params
+    );
+    setConsultaApi(response.data.c_det_solicitud);
+    console.log("VER VALOR DEFINITIVO", response.data.c_det_solicitud);
+  };
 
+  useEffect(() => {
+    if (codigoPerfil !== undefined) {
+      handleBroker();
+    }
+  }, [codigoPerfil]);
 
   const columns = useMemo(
     //column definitions...
@@ -69,11 +93,20 @@ const page = () => {
         Cell: ({ cell }) => (
           <span
             style={{
-              color: cell.getValue() === "A" ? "green" : cell.getValue() === "P" ? "orange" : "red",
+              color:
+                cell.getValue() === "A"
+                  ? "green"
+                  : cell.getValue() === "P"
+                  ? "orange"
+                  : "red",
               fontWeight: "bold",
             }}
           >
-            {cell.getValue() === "A" ? "Aprobado" : cell.getValue() === "P" ? "Pendiente" : "Rechazado"}
+            {cell.getValue() === "A"
+              ? "Aprobado"
+              : cell.getValue() === "P"
+              ? "Pendiente"
+              : "Rechazado"}
           </span>
         ),
       },
@@ -88,14 +121,14 @@ const page = () => {
         header: "URL",
         size: 300,
         Cell: ({ cell }) => (
-          <a 
-            href={cell.getValue()} 
-            target="_blank" 
+          <a
+            href={cell.getValue()}
+            target="_blank"
             rel="noopener noreferrer"
             style={{
-              color: '#1976d2', // Color azul de Material-UI
-              textDecoration: 'underline', // Opcional: subrayado para indicar que es un enlace
-              cursor: 'pointer', // Cambia el cursor al pasar el mouse
+              color: "#1976d2", // Color azul de Material-UI
+              textDecoration: "underline", // Opcional: subrayado para indicar que es un enlace
+              cursor: "pointer", // Cambia el cursor al pasar el mouse
             }}
           >
             {cell.getValue()}
@@ -156,50 +189,28 @@ const page = () => {
         fontWeight: "bold",
         fontSize: "0.9rem",
       },
-    }
-    // renderDetailPanel: ({ row }) => {
-    //   const details = detailData[row.original.id] || [];
-
-    //   return (
-    //     <Box sx={{ padding: "16px", width: "100%" }}>
-    //       {/* <Typography variant="h6" gutterBottom>
-    //         Tareas del Proyecto: {row.original.nombre}
-    //       </Typography> */}
-
-    //       <MaterialReactTable
-    //         columns={[
-    //           { accessorKey: "tarea", header: "Tarea", size: 200 },
-    //           { accessorKey: "estado", header: "Estado", size: 100 },
-    //           { accessorKey: "fecha", header: "Fecha", size: 120 },
-    //         ]}
-    //         data={details}
-    //         // initialState={{ density: "compact" }}
-    //         muiTableCo
-    //       />
-    //     </Box>
-    //   );
-    // },
+    },
   });
 
   return (
     <>
-      <Container component="main" maxWidth="xl" >
+      <Container component="main" maxWidth="xl">
         <Card elevation={6} sx={{ width: "100%", marginBottom: 3 }}>
           <Box sx={{ p: 3 }}>
-            <Typography component="div">Documentacion</Typography>
+            <Typography variant="h6">Documentación APIS</Typography>
           </Box>
           <Divider />
-
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', p: 2}}>
-            <AdvisorController
-              {...objForm}
-              label="Asesor de seguros"
-              name={`p_advisor_selected_${index}`}
-              //codBroker={selectedBroker}
-              onChange={handleBroker}
-            />
-          </Box>
-
+          {codigoPerfil !== "insurance_broker" && (
+            <Box sx={{ borderBottom: 1, borderColor: "divider", p: 2 }}>
+              <AdvisorController
+                {...objForm}
+                label="Asesor de seguros"
+                name={`p_advisor_selected_${index}`}
+                //codBroker={selectedBroker}
+                onChange={handleBroker}
+              />
+            </Box>
+          )}
           <Box>
             <MaterialReactTable table={table} />
           </Box>
@@ -210,9 +221,3 @@ const page = () => {
 };
 
 export default page;
-
-
-
-
-
-
