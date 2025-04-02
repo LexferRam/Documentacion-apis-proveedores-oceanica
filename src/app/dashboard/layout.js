@@ -1,191 +1,107 @@
-"use client";
+'use client'
 
-// import React from "react";
-// import Header from "../components/header";
-// import Sidebar from "../components/sidebar";
-// import { CssBaseline, AppBar, Toolbar, Typography } from "@mui/material";
-
-// const layout = ({children}) => {
-//   return (
-//     <>
-//       <Header />
-//       <CssBaseline />
-//       <Header />
-//      <Sidebar />
-//      {children}
-//     </>
-//   );
-// };
-
-// export default layout;
-
-import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
+import { AppBar, CssBaseline, IconButton, Toolbar, Typography } from '@mui/material';
 import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import Link from "next/link";
-import Image from "next/image";
-import "../style.css"
+import Link from 'next/link';
+import Image from 'next/image';
+import { useSelectedLayoutSegment } from 'next/navigation';
 
-const drawerWidth = 240;
+export default function AnchorTemporaryDrawer({ children }) {
+  const activeSegment = useSelectedLayoutSegment()
+  const [state, setState] = React.useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${drawerWidth}px`,
-    variants: [
-      {
-        props: ({ open }) => open,
-        style: {
-          transition: theme.transitions.create("margin", {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-          marginLeft: 0,
-        },
-      },
-    ],
-  })
-);
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(["margin", "width"], {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-  ],
-}));
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
-}));
-
-export default function PersistentDrawerLeft({ children }) {
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
+    setState({ ...state, [anchor]: open });
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar color="default" position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            // aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={[
-              {
-                mr: 2,
-              },
-              open && { display: "none" },
-            ]}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Image
-            src="https://asesores.segurospiramide.com/static/logo-piramides-d07524ef35db8b8403dff1b54884e9aa.svg" // Ruta del logo (guárdalo en la carpeta public)
-            alt="Logo de la empresa"
-            width={150}
-            height={50}
-            className="image-logo"            
-          />
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
+  const list = (anchor) => (
+    <Box
+      sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      <List>
         <List>
-          {/* <ListItem style={{cursor:"pointer"}} button> */}
           <Link href="/dashboard/solicitud">
-            <ListItemButton>
+            <ListItemButton selected={activeSegment === 'solicitud'}>
               <ListItemText primary="Solicitudes" />
             </ListItemButton>
           </Link>
-          {/* </ListItem> */}
-          {/* <ListItem style={{cursor:"pointer"}} button> */}
 
           <Link href="/dashboard/documentacion">
-            <ListItemButton>
+            <ListItemButton selected={activeSegment === 'documentacion'}>
               <ListItemText primary="Documentación API" />
             </ListItemButton>
           </Link>
-          {/* </ListItem> */}
         </List>
         <Divider />
-      </Drawer>
-      <Main open={open}>
-        <DrawerHeader />
-        {children}
-      </Main>
+      </List>
     </Box>
+  );
+
+  return (
+    <div>
+      <Button onClick={toggleDrawer('left', true)}>{'left'}</Button>
+      <Drawer
+        anchor={'left'}
+        open={state['left']}
+        onClose={toggleDrawer('left', false)}
+      >
+        {list('left')}
+      </Drawer>
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+      >
+        <Toolbar />
+        <CssBaseline />
+        <AppBar color="default" position="fixed" open={state['left']}>
+          <Toolbar sx={{ display: 'flex' }}>
+            <IconButton
+              color="inherit"
+              // aria-label="open drawer"
+              onClick={toggleDrawer('left', true)}
+              edge="start"
+            >
+              <MenuIcon />
+            </IconButton>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+              <Image
+                src="https://asesores.segurospiramide.com/static/logo-piramides-d07524ef35db8b8403dff1b54884e9aa.svg"
+                alt="Logo de la empresa"
+                width={150}
+                height={50}
+                className="image-logo"
+              />
+            </div>
+          </Toolbar>
+        </AppBar>
+
+        {children}
+
+      </Box>
+    </div>
   );
 }
