@@ -14,11 +14,13 @@
     "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.4.8",
     "@mui/x-date-pickers": "^7.28.0",
+    "awesome-debounce-promise": "^2.1.0",
     "axios": "^1.8.1",
     "material-react-table": "^3.2.1",
     "next": "15.2.1",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.55.0"
   }
 }
