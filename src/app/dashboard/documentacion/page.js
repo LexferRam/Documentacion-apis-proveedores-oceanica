@@ -161,7 +161,7 @@ const page = () => {
   return (
     <>
       <Container component="main" maxWidth="xl" >
-        <Card elevation={6} sx={{ width: "100%", padding: 3, marginBottom: 3, height: '85vh' }}>
+        <Card elevation={6} sx={{ width: "100%", padding: 3, marginBottom: 3 }}>
           <Box sx={{ p: 2 }}>
             <Typography component="div">Documentacion</Typography>
           </Box>
