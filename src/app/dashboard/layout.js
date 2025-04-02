@@ -13,6 +13,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSelectedLayoutSegment } from 'next/navigation';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'; // Icono para cerrar sesión
+
 
 export default function AnchorTemporaryDrawer({ children }) {
   const activeSegment = useSelectedLayoutSegment()
@@ -29,6 +31,23 @@ export default function AnchorTemporaryDrawer({ children }) {
     }
 
     setState({ ...state, [anchor]: open });
+    
+  };
+
+  // Función para cerrar sesión
+  const handleLogout = async () => {
+    try {
+      
+      // Si tienes tu propio sistema de autenticación:
+      // await fetch('/api/logout', { method: 'POST' });
+      // document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      sessionStorage.removeItem("PROFILE_KEY");
+     
+      window.location.href = "/documentacion_api"; 
+     
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   const list = (anchor) => (
@@ -53,7 +72,14 @@ export default function AnchorTemporaryDrawer({ children }) {
           </Link>
         </List>
         <Divider />
+             {/* Opción de cerrar sesión en el drawer (opcional) */}
+             <ListItemButton onClick={handleLogout}>
+          <ExitToAppIcon sx={{ mr: 1 }} />
+          <ListItemText primary="Cerrar Sesión" />
+        </ListItemButton>
       </List>
+
+      
     </Box>
   );
 
@@ -100,3 +126,7 @@ export default function AnchorTemporaryDrawer({ children }) {
     </>
   );
 }
+
+
+
+
