@@ -62,7 +62,7 @@ export default function AnchorTemporaryDrawer({ children }) {
   );
 
   return (
-    <div>
+    <>
       <Button onClick={toggleDrawer('left', true)}>{'left'}</Button>
       <Drawer
         anchor={'left'}
@@ -73,7 +73,7 @@ export default function AnchorTemporaryDrawer({ children }) {
       </Drawer>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 0, m: 0 }}
       >
         <Toolbar />
         <CssBaseline />
@@ -102,6 +102,6 @@ export default function AnchorTemporaryDrawer({ children }) {
         {children}
 
       </Box>
-    </div>
+    </>
   );
 }

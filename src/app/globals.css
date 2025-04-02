@@ -25,6 +25,14 @@ body {
 
 }
 
+
+@media screen and (max-width: 400px) {
+  main{
+    padding: 0px !important;
+  }
+
+}
+
 * {
   box-sizing: border-box;
   padding: 0;

@@ -445,8 +445,8 @@ const Page = () => {
       const detalles = row.original.detalles || [];
 
       return (
-        <Box sx={{ padding: "16px", width: "100%" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <Box sx={{ padding: "0px", width: "100%" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", padding: "0px" }}>
             <thead>
               <tr style={{ backgroundColor: "#f5f5f5" }}>
                 {detailColumns.map((column) => (
@@ -501,8 +501,8 @@ const Page = () => {
     <>
       {!show ? (
         <Container component="main" maxWidth="lg">
-          <Card elevation={6} sx={{ width: "100%", padding: 3, marginBottom: 3 }}>
-            <Box sx={{ p: 2 }}>
+          <Card elevation={6} sx={{ width: "100%", marginBottom: 3 }}>
+            <Box sx={{ p: 3 }}>
               <Typography variant="h6">Gestión de Solicitudes</Typography>
             </Box>
             <Divider />
@@ -529,7 +529,7 @@ const Page = () => {
                 <Button
                   size="small"
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
+                  sx={{ m: 3 }}
                   color="error"
                   onClick={handleOnClick}
                 >
