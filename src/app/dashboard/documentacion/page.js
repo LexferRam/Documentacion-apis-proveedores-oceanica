@@ -125,15 +125,14 @@ const page = () => {
     // getSubRows: (row) => row.subRows, //default
     initialState: { expanded: false }, //expand all rows by default
     paginateExpandedRows: true, //When rows are expanded, do not count sub-rows as number of rows on the page towards pagination
-    muiTableHeadCellProps: ({ column }) => {
-      console.log("colum:", column.id);
-      return {
-        sx: {
-          background: column.getIsPinned() ? "#fc2d22 !important" : "#eb4215",
-          zIndex: column.getIsPinned() ? 9 : 2,
-        },
-      };
-    },
+    muiTableHeadCellProps: {
+      sx: {
+        background: "#eb4215",
+        color: "white",
+        fontWeight: "bold",
+        fontSize: "0.9rem",
+      },
+    }
     // renderDetailPanel: ({ row }) => {
     //   const details = detailData[row.original.id] || [];
 
@@ -161,13 +160,13 @@ const page = () => {
   return (
     <>
       <Container component="main" maxWidth="xl" >
-        <Card elevation={6} sx={{ width: "100%", padding: 3, marginBottom: 3 }}>
-          <Box sx={{ p: 2 }}>
+        <Card elevation={6} sx={{ width: "100%", marginBottom: 3 }}>
+          <Box sx={{ p: 3 }}>
             <Typography component="div">Documentacion</Typography>
           </Box>
           <Divider />
 
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', p: 2}}>
             <AdvisorController
               {...objForm}
               label="Asesor de seguros"
@@ -177,7 +176,7 @@ const page = () => {
             />
           </Box>
 
-          <Box sx={{ p: 2 }}>
+          <Box>
             <MaterialReactTable table={table} />
           </Box>
         </Card>
