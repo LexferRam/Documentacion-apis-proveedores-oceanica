@@ -6,13 +6,9 @@ import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import { AppBar, CssBaseline, IconButton, Toolbar, Typography } from '@mui/material';
+import { AppBar, CssBaseline, IconButton, Toolbar } from '@mui/material';
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from 'next/link';
 import Image from 'next/image';
@@ -63,7 +59,6 @@ export default function AnchorTemporaryDrawer({ children }) {
 
   return (
     <>
-      <Button onClick={toggleDrawer('left', true)}>{'left'}</Button>
       <Drawer
         anchor={'left'}
         open={state['left']}
@@ -73,7 +68,7 @@ export default function AnchorTemporaryDrawer({ children }) {
       </Drawer>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 0, m: 0 }}
+        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 0, mt: 4 }}
       >
         <Toolbar />
         <CssBaseline />
