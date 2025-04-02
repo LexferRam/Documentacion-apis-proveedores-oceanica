@@ -539,7 +539,7 @@ const Page = () => {
             </Grid>
             
             {/* Contenido de cada tab */}
-            <Box sx={{ p: 2 }}>
+            <Box>
               {tabValue === 0 && (
                 <MaterialReactTable  table={table}  />
               )}
