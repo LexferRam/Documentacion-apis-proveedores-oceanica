@@ -501,7 +501,7 @@ const Page = () => {
     <>
       {!show ? (
         <Container component="main" maxWidth="xl" >
-          <Card elevation={6} sx={{ width: "100%", marginBottom: 3 }}>
+          <Card elevation={6} sx={{ width: "100%", marginBottom: 3,height: '80vh' }}>
             <Box sx={{ p: 3 }}>
               <Typography variant="h6">Gestión de Solicitudes</Typography>
             </Box>
