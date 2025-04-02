@@ -8,15 +8,15 @@ import {
   Box,
   Grid,
   Tooltip,
-  IconButton,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Card,
+  Tabs,
+  Tab,
+  Divider,
 } from "@mui/material";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import Divider from "@mui/material/Divider";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -44,18 +44,21 @@ const Page = () => {
     c_solicitud: [],
     c_det_solicitud: [],
   });
+  const [dataHistoricoSolicitudes, setDataHistoricoSolicitudes] = useState({
+    c_solicitud: [],
+    c_det_solicitud: [],
+  });
   const [selectedValues, setSelectedValues] = useState({});
   const [changes, setChanges] = useState([]);
+  const [tabValue, setTabValue] = useState(0); // Estado para controlar el tab activo
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   const handleOnClick = () => {
     setShow(true);
   };
-
-  //   useEffect(() => {
-  //  console.log('ver' , selectedValues)
-  //  console.log('ver 2' , changes)
-
-  //   }, [selectedValues,changes])
 
   const handleSelectChange = (event, rowId) => {
     const [masterId, productName, codApi] = rowId.split("_");
@@ -84,11 +87,8 @@ const Page = () => {
             ID_SOLICITUD: masterId,
             NOMBRE: productName,
             ESTATUS: newValue === "Aprobado" ? "A" : "R",
-            URL:
-              event.target.value === "Aprobado"
-                ? "URL_APROBADO"
-                : "URL_RECHAZADO",
-           CODIGO_API: codApi
+            URL: event.target.value === "Aprobado" ? "URL_APROBADO" : "URL_RECHAZADO",
+            CODIGO_API: codApi
           },
         ];
       }
@@ -98,17 +98,14 @@ const Page = () => {
   const handleUpdateClick = async (masterData) => {
     try {
       const detallesActualizados = changes.filter(
-        (change) =>
-          change.ID_SOLICITUD.toString() === masterData.ID_SOLICITUD.toString()
+        (change) => change.ID_SOLICITUD.toString() === masterData.ID_SOLICITUD.toString()
       );
-         console.log('valor 1 ', detallesActualizados)
 
       if (detallesActualizados.length === 0) {
         alert("No hay cambios para actualizar en esta solicitud");
         return;
       }
 
-      // Transformación al formato requerido por la API
       const apiPayload = {
         p_cia: 1,
         p_id_solicitud: masterData.ID_SOLICITUD,
@@ -116,10 +113,9 @@ const Page = () => {
         arr_apis: detallesActualizados.map((d) => d.CODIGO_API).join("|"),
         arr_apis_sts: detallesActualizados.map((d) => d.ESTATUS).join("|"),
       };
-
-      // Ejemplo de llamada a la API (descomenta cuando tengas el endpoint)
       
-      const response = await Axios.post('https://segurospiramide.com/asg-api/dbo/doc_api/sp_Actualizar_solicitud', 
+      const response = await Axios.post(
+        'https://segurospiramide.com/asg-api/dbo/doc_api/sp_Actualizar_solicitud', 
         apiPayload
       );
   
@@ -127,16 +123,13 @@ const Page = () => {
         setDataHistorico({
           c_solicitud: [],
           c_det_solicitud: [],
-        })
-        constDataHistorico(); // Refrescar datos
+        });
+        constDataHistorico();
         setChanges(prev => prev.filter(change => change.ID_SOLICITUD !== masterData.ID_SOLICITUD));
+        alert('Actualización exitosa');
       } else {
         throw new Error(response.data.message);
       }
-      alert(
-        `Solicitud ${masterData.ID_SOLICITUD} actualizada con ${detallesActualizados.length} cambios`
-      );
-      console.log("Payload que se enviaría:", apiPayload);
     } catch (error) {
       console.error("Error al actualizar:", error);
       alert(`Error al actualizar: ${error.message}`);
@@ -144,7 +137,6 @@ const Page = () => {
   };
 
   const constDataHistorico = async () => {
-    alert('entroo a funcion ')
     try {
       const params = {
         p_cia: 1,
@@ -169,8 +161,34 @@ const Page = () => {
     }
   };
 
+  const constDataHistoricoSolicitudes = async () => {
+    try {
+      const params = {
+        p_cia: 1,
+        p_codinter: "0",
+      };
+      const response = await Axios.post(
+        "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitudes_hist",
+        params
+      );
+      setDataHistoricoSolicitudes(
+        response.data || {
+          c_solicitud: [],
+          c_det_solicitud: [],
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setDataHistoricoSolicitudes({
+        c_solicitud: [],
+        c_det_solicitud: [],
+      });
+    }
+  };
+
   useEffect(() => {
     constDataHistorico();
+    constDataHistoricoSolicitudes();
   }, []);
 
   const transformedData = useMemo(
@@ -185,6 +203,18 @@ const Page = () => {
     [dataHistorico]
   );
 
+  const transformedDataHistorico = useMemo(
+    () =>
+      dataHistoricoSolicitudes.c_solicitud?.map((solicitud) => ({
+        ...solicitud,
+        FECHA: new Date(solicitud.FECHA).toLocaleDateString(),
+        detalles: dataHistoricoSolicitudes.c_det_solicitud.filter(
+          (det) => det.ID_SOLICITUD === solicitud.ID_SOLICITUD
+        ),
+      })),
+    [dataHistoricoSolicitudes]
+  );
+
   const detailColumns = useMemo(
     () => [
       {
@@ -194,7 +224,7 @@ const Page = () => {
       },
       {
         accessorKey: "CODIGO_API",
-        header: "codigo Producto",
+        header: "Código Producto",
         size: 200,
       },
       {
@@ -208,7 +238,7 @@ const Page = () => {
               fontWeight: "bold",
             }}
           >
-            {cell.getValue() === "A" ? "Aprobado" :cell.getValue() === "P" ? "Pendiente": "Rechazado"}
+            {cell.getValue() === "A" ? "Aprobado" : cell.getValue() === "P" ? "Pendiente" : "Rechazado"}
           </span>
         ),
       },
@@ -227,7 +257,6 @@ const Page = () => {
         size: 120,
         Cell: ({ row }) => {
           const rowId = `${row.original.ID_SOLICITUD}_${row.original.NOMBRE}_${row.original.CODIGO_API}`;
-
           return (
             <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
               <InputLabel id={`select-label-${rowId}`}>Estatus</InputLabel>
@@ -287,7 +316,7 @@ const Page = () => {
               fontWeight: "bold",
             }}
           >
-            {cell.getValue() === "A" ? "Aprobado" : cell.getValue() === "P" ? "Pendiente" :"Rechazado"}
+            {cell.getValue() === "A" ? "Aprobado" : cell.getValue() === "P" ? "Pendiente" : "Rechazado"}
           </span>
         ),
       },
@@ -295,7 +324,9 @@ const Page = () => {
         header: "Acción",
         size: 80,
         Cell: ({ row }) => {
-          const hasChanges = changes.some(change => change.ID_SOLICITUD.toString() === row.original.ID_SOLICITUD.toString());
+          const hasChanges = changes.some(
+            change => change.ID_SOLICITUD.toString() === row.original.ID_SOLICITUD.toString()
+          );
           return (
             <Tooltip title={hasChanges ? "Actualizar cambios" : "No hay cambios para actualizar"}>
               <Button
@@ -392,18 +423,107 @@ const Page = () => {
     },
   });
 
+
+  const tableHistoricoSolicitudes = useMaterialReactTable({
+    columns,
+    data: transformedDataHistorico,
+    localization: MRT_Localization_ES,
+    enableExpandAll: true,
+    enableExpanding: true,
+    filterFromLeafRows: true,
+    initialState: { expanded: false },
+    paginateExpandedRows: true,
+    muiTableHeadCellProps: {
+      sx: {
+        background: "#eb4215",
+        color: "white",
+        fontWeight: "bold",
+        fontSize: "0.9rem",
+      },
+    },
+    renderDetailPanel: ({ row }) => {
+      const detalles = row.original.detalles || [];
+
+      return (
+        <Box sx={{ padding: "16px", width: "100%" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ backgroundColor: "#f5f5f5" }}>
+                {detailColumns.map((column) => (
+                  <th
+                    key={column.accessorKey || column.header}
+                    style={{
+                      padding: "8px",
+                      textAlign: "left",
+                      fontWeight: "bold",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    {column.header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {detalles.map((detalle, index) => (
+                <tr key={index}>
+                  {detailColumns.map((column) => (
+                    <td
+                      key={column.accessorKey || column.header}
+                      style={{
+                        padding: "8px",
+                        borderBottom: "1px solid #e0e0e0",
+                      }}
+                    >
+                      {column.Cell ? (
+                        <column.Cell
+                          cell={{ getValue: () => detalle[column.accessorKey] }}
+                          row={{ original: detalle }}
+                        />
+                      ) : (
+                        detalle[column.accessorKey]
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Box>
+      );
+    },
+  });
+
+
+
+
   return (
     <>
       {!show ? (
         <Container component="main" maxWidth="lg">
-          <Card
-            elevation={6}
-            sx={{ width: "100%", padding: 3, marginBottom: 3 }}
-          >
+          <Card elevation={6} sx={{ width: "100%", padding: 3, marginBottom: 3 }}>
             <Box sx={{ p: 2 }}>
-              <Typography variant="h6">Solicitudes</Typography>
+              <Typography variant="h6">Gestión de Solicitudes</Typography>
             </Box>
             <Divider />
+            
+            {/* Tabs para navegar entre las secciones */}
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs 
+                value={tabValue} 
+                onChange={handleTabChange} 
+                aria-label="solicitudes tabs"
+                sx={{
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: '#eb4215',
+                  }
+                }}
+              >
+                <Tab label="Solicitudes Actuales" />
+                <Tab label="Histórico de Solicitudes" />
+              </Tabs>
+            </Box>
+            
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Button
@@ -413,12 +533,19 @@ const Page = () => {
                   color="error"
                   onClick={handleOnClick}
                 >
-                  Solicitar
+                  Nueva Solicitud
                 </Button>
               </Grid>
             </Grid>
+            
+            {/* Contenido de cada tab */}
             <Box sx={{ p: 2 }}>
-              <MaterialReactTable table={table} />
+              {tabValue === 0 && (
+                <MaterialReactTable  table={table}  />
+              )}
+              {tabValue === 1 && (
+                <MaterialReactTable table={tableHistoricoSolicitudes} />
+              )}
             </Box>
           </Card>
         </Container>
