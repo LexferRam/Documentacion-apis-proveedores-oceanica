@@ -36,7 +36,6 @@ const page = () => {
     if (result.status === 400) {
       alert("falla autenticacion"); // Muestra un mensaje de error si la autenticación falla
     } else {
-      alert("entroo");
       sessionStorage.setItem("PROFILE_KEY", JSON.stringify(result.user));
       window.location.href = "/dashboard/solicitud"; // Redirige al usuario a la página principal
     }
