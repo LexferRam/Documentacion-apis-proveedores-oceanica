@@ -924,7 +924,7 @@ const Page = () => {
           </Card>
         </Container>
       ) : (
-        <FormSolicitud />
+        <FormSolicitud show={show} setShow={setShow}/>
       )}
     </>
   );
