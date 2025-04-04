@@ -110,7 +110,7 @@ export default function AnchorTemporaryDrawer({ children }) {
             </IconButton>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
               <Image
-                src="https://asesores.segurospiramide.com/static/logo-piramides-d07524ef35db8b8403dff1b54884e9aa.svg"
+                src="https://oceanicadeseguros.com/static/oceanica_original-1035af5b673858a792c437cf229007bd.png"
                 alt="Logo de la empresa"
                 width={150}
                 height={50}

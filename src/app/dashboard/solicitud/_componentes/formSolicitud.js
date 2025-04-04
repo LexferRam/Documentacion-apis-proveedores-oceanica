@@ -20,6 +20,7 @@ import {
 import React, { useState } from "react";
 import { Send, Clear } from "@mui/icons-material";
 import Axios from "axios";
+import { useLoadingProvider } from "@/context/LoadingContext";
 
 const listaValores = {
   "c_detalle_api": [
@@ -51,7 +52,7 @@ const listaValores = {
   ]
 };
 
-const FormSolicitud = ({ show, setShow }) => {
+const FormSolicitud = ({ show, setShow , constDataHistorico}) => {
   const theme = useTheme();
   const [formData, setFormData] = useState({
     nombre: "",
@@ -65,6 +66,7 @@ const FormSolicitud = ({ show, setShow }) => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState(null);
+    const {setLoading} =  useLoadingProvider()
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,7 +92,7 @@ const FormSolicitud = ({ show, setShow }) => {
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       nuevosErrores.email = "Email no válido";
     }
-    if (!formData.codigoIntermediario) nuevosErrores.codigoIntermediario = "Código Intermediario es requerido";
+    // if (!formData.codigoIntermediario) nuevosErrores.codigoIntermediario = "Código Intermediario es requerido";
     if (formData.telefono && !/^[0-9]{7,15}$/.test(formData.telefono)) {
       nuevosErrores.telefono = "Teléfono no válido";
     }
@@ -103,7 +105,9 @@ const FormSolicitud = ({ show, setShow }) => {
   };
 
   const handleSubmit = async (e) => {
+    
     e.preventDefault();
+    setLoading(true)
     setApiError(null);
     
     if (!validarFormulario()) {
@@ -115,7 +119,7 @@ const FormSolicitud = ({ show, setShow }) => {
     try {
       const datosEnvio = {
         p_cia: 1,
-        p_codinter: formData.codigoIntermediario,
+        p_codinter: '14',
         p_estatus: "P",
         p_contacto: formData.nombre,
         p_email: formData.email,
@@ -123,21 +127,18 @@ const FormSolicitud = ({ show, setShow }) => {
         arr_apis: formData.productosSeleccionados.join("|")
       };
 
-      console.log("Datos a enviar a la API:", datosEnvio);
-
-
-
       const response = await Axios.post(
         "https://segurospiramide.com/asg-api/dbo/doc_api/sp_crear_solicitud_Asesor",
         datosEnvio
       );
-   
-        console.log('ver respuesta ', response.data)
-      
+  
       // Simulación de envío a API
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setSubmitSuccess(true);
+      await constDataHistorico()
+      setShow(false)
+     
       setFormData({
         nombre: "",
         email: "",
@@ -145,13 +146,16 @@ const FormSolicitud = ({ show, setShow }) => {
         telefono: "",
         productosSeleccionados: [],
       });
+     
 
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
       setApiError("Ocurrió un error al enviar el formulario. Por favor intente nuevamente.");
     } finally {
+       setLoading(false)
       setIsSubmitting(false);
     }
+    
   };
 
   const handleReset = () => {
@@ -188,7 +192,8 @@ const FormSolicitud = ({ show, setShow }) => {
             sx={{ 
               fontWeight: 'bold',
               color: 'black',
-              mb: 2
+              mb: 2,
+              fontFamily: 'serif'
             }}
           >
             Gestión de Solicitudes
@@ -215,7 +220,7 @@ const FormSolicitud = ({ show, setShow }) => {
           sx={{ mt: 2 }}
         >
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <TextField
                 fullWidth
                 label="Nombre completo"
@@ -230,7 +235,7 @@ const FormSolicitud = ({ show, setShow }) => {
               />
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Código Intermediario"
@@ -243,7 +248,7 @@ const FormSolicitud = ({ show, setShow }) => {
                 margin="normal"
                 required
               />
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} md={6}>
               <TextField
@@ -355,7 +360,7 @@ const FormSolicitud = ({ show, setShow }) => {
                     py: 0.8 // Padding vertical reducido
                   }}
                 >
-                  Cancelar
+                  Regresar
                 </Button>
                 <Button 
                   type="submit" 
@@ -365,8 +370,11 @@ const FormSolicitud = ({ show, setShow }) => {
                   startIcon={<Send />}
                   disabled={isSubmitting}
                   sx={{ 
-                    px: 2,
-                    py: 0.8
+                    
+                    backgroundColor: '#47c0b6',
+                    '&:hover': {
+                      backgroundColor: '#3aa99e', // Un tono un poco más oscuro para el hover
+                    }
                   }}
                 >
                   {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}

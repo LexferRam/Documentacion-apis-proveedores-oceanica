@@ -38,12 +38,11 @@ export const listaValor = {
   ],
 };
 
-
 function useSessionStorage(key) {
   const [value, setValue] = useState(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const item = sessionStorage.getItem(key);
       if (item) {
         setValue(JSON.parse(item));
@@ -58,7 +57,7 @@ const Page = () => {
   const profile = useSessionStorage("PROFILE_KEY");
   const codigoPerfil = profile?.PROFILE_CODE;
 
-   console.log('intermediario' ,codigoPerfil )
+  console.log("intermediario", codigoPerfil);
 
   const [show, setShow] = useState(false);
   const [dataHistorico, setDataHistorico] = useState({
@@ -174,11 +173,13 @@ const Page = () => {
 
   const constDataHistorico = async () => {
     try {
-
-       console.log('ver valor' ,codigoPerfil )
+      // console.log("ver valor", codigoPerfil);
       const params = {
         p_cia: 1,
-        p_codinter: codigoPerfil === "insurance_broker"? profile.p_insurance_broker_code:  "0",
+        p_codinter:
+          codigoPerfil === "insurance_broker"
+            ? profile.p_insurance_broker_code
+            : "0",
       };
       const response = await Axios.post(
         "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitudes",
@@ -203,10 +204,13 @@ const Page = () => {
     try {
       const params = {
         p_cia: 1,
-        p_codinter: codigoPerfil === "insurance_broker" ? profile.p_insurance_broker_code :  "0",
+        p_codinter:
+          codigoPerfil === "insurance_broker"
+            ? profile.p_insurance_broker_code
+            : "0",
       };
-      
-       console.log('ver valor params' ,params )
+
+      console.log("ver valor params", params);
 
       const response = await Axios.post(
         "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitudes_hist",
@@ -228,7 +232,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    if(codigoPerfil !== undefined){
+    if (codigoPerfil !== undefined) {
       constDataHistorico();
       constDataHistoricoSolicitudes();
     }
@@ -272,8 +276,7 @@ const Page = () => {
 
   const detailColumns = useMemo(
     () => [
-
-       {
+      {
         accessorKey: "NOMBRE",
         header: "Producto",
         size: 200,
@@ -638,11 +641,9 @@ const Page = () => {
           </span>
         ),
       },
-
     ],
     []
   );
-
 
   const table = useMaterialReactTable({
     columns,
@@ -655,7 +656,7 @@ const Page = () => {
     paginateExpandedRows: true,
     muiTableHeadCellProps: {
       sx: {
-        background: "#eb4215",
+        background: "#47c0b6",
         color: "white",
         fontWeight: "bold",
         fontSize: "0.9rem",
@@ -725,7 +726,7 @@ const Page = () => {
     paginateExpandedRows: true,
     muiTableHeadCellProps: {
       sx: {
-        background: "#eb4215",
+        background: "#47c0b6",
         color: "white",
         fontWeight: "bold",
         fontSize: "0.9rem",
@@ -801,7 +802,7 @@ const Page = () => {
     paginateExpandedRows: true,
     muiTableHeadCellProps: {
       sx: {
-        background: "#eb4215",
+        background: "#47c0b6",
         color: "white",
         fontWeight: "bold",
         fontSize: "0.9rem",
@@ -866,11 +867,6 @@ const Page = () => {
     },
   });
 
-
-
-
-
-
   return (
     <>
       {!show ? (
@@ -889,7 +885,7 @@ const Page = () => {
                 aria-label="solicitudes tabs"
                 sx={{
                   "& .MuiTabs-indicator": {
-                    backgroundColor: "#eb4215",
+                    backgroundColor: "#47c0b6",
                   },
                 }}
               >
@@ -898,14 +894,19 @@ const Page = () => {
               </Tabs>
             </Box>
 
-            {codigoPerfil === "insurance_broker" && (
+            {codigoPerfil === "insurance_broker" && tabValue === 0 && (
               <Grid container justifyContent="flex-end">
                 <Grid item>
                   <Button
-                    size="small"
                     variant="contained"
-                    sx={{ m: 3 }}
-                    color="error"
+                    size="small"
+                    sx={{
+                      m: 3,
+                      backgroundColor: "#47c0b6",
+                      "&:hover": {
+                        backgroundColor: "#3aa99e", // Un tono un poco más oscuro para el hover
+                      },
+                    }}
                     onClick={handleOnClick}
                   >
                     Nueva Solicitud
@@ -916,7 +917,13 @@ const Page = () => {
 
             {/* Contenido de cada tab */}
             <Box>
-              {tabValue === 0 && <MaterialReactTable table={ codigoPerfil !== "insurance_broker" ? table: tableAsesor} />}
+              {tabValue === 0 && (
+                <MaterialReactTable
+                  table={
+                    codigoPerfil !== "insurance_broker" ? table : tableAsesor
+                  }
+                />
+              )}
               {tabValue === 1 && (
                 <MaterialReactTable table={tableHistoricoSolicitudes} />
               )}
@@ -924,7 +931,7 @@ const Page = () => {
           </Card>
         </Container>
       ) : (
-        <FormSolicitud show={show} setShow={setShow}/>
+        <FormSolicitud show={show} setShow={setShow}  constDataHistorico={constDataHistorico}/>
       )}
     </>
   );
