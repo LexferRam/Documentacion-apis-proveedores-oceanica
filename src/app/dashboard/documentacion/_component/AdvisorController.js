@@ -14,7 +14,7 @@ export default function AdvisorController(props) {
       p_query: p_query,
       p_cod_broker: p_cod_broker,
     }
-    const response = await Axios.post("https://segurospiramide.com/asg-api/dbo/insurance_broker/get_brokers_list", params)
+    const response = await Axios.post("https://oceanicadeseguros.com/asg-api/dbo/insurance_broker/get_brokers_list", params)
     setOptions(response.data.p_cur_data)
     if(p_cod_broker!==null)
       setInputValue(response.data.p_cur_data[0])

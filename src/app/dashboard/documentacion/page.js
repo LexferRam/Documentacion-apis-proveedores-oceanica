@@ -58,14 +58,14 @@ const page = () => {
 
   const handleBroker = async (value) => {
     const params = {
-      p_cia: 1,
+      p_cia: 2,
       p_codinter:
         codigoPerfil === "insurance_broker"
           ? profile.p_insurance_broker_code
           : value,
     };
     const response = await Axios.post(
-      "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitud_asesor",
+      "https://oceanicadeseguros.com/asg-api/dbo/doc_api/sp_consulta_solicitud_asesor",
       params
     );
     setConsultaApi(response.data.c_det_solicitud);

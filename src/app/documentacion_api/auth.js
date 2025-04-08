@@ -4,7 +4,7 @@ export const login = async (p_portal_username, p_pwd) => {
   console.log("entroooooo");
   try {
     const response = await axios.post(
-      "https://asesores.segurospiramide.com/asg-api/login",
+      "https://oceanicadeseguros.com/asg-api/login",
       {
         p_portal_username: p_portal_username,
         p_pwd: p_pwd,

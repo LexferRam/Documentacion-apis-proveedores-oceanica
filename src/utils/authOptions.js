@@ -18,7 +18,7 @@ export const authOptions = {
         try {
           // Llama a tu API externa para verificar las credenciales
           const { data } = await axios.post(
-            "https://asesores.segurospiramide.com/asg-api/login", // Endpoint de tu API
+            "https://oceanicadeseguros.com/asg-api/login", // Endpoint de tu API
             {
               p_portal_username: credentials.p_portal_username,
               p_pwd: credentials.p_pwd

@@ -40,6 +40,7 @@ const page = () => {
     const result = await login(p_portal_username, p_pwd);
     if (result.status === 400) {
       alert("falla autenticacion");
+      setLoading(false);
     } else {
       setLoading(false);
       sessionStorage.setItem("PROFILE_KEY", JSON.stringify(result.user));
@@ -97,7 +98,7 @@ const page = () => {
                 mb: 1,
                 fontFamily: 'system-ui'
               }}>
-                Sistema gestión de APIS
+                Sistema Gestión de APIS
               </Typography>
               
               <Divider sx={{ 
@@ -182,7 +183,7 @@ const page = () => {
               <Grid container justifyContent="center" sx={{ mt: 3 }}>
                 <Grid item>
                   <Link
-                    href="https://asesores.segurospiramide.com/register"
+                    href="https://oceanicadeseguros.com/register"
                     variant="body2"
                     color="text.secondary"
                     underline="hover"
