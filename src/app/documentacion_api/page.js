@@ -11,147 +11,197 @@ import {
   InputAdornment,
   Card,
   CardContent,
+  Divider,
+  useTheme
 } from "@mui/material";
-import { Lock } from "@mui/icons-material"; // Iconos de Material-UI
+import { Lock } from "@mui/icons-material";
 import Image from "next/image";
 import PersonIcon from "@mui/icons-material/Person";
 import { login } from "./auth";
 import { IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useLoadingProvider } from "@/context/LoadingContext";
 
 const page = () => {
   const [p_portal_username, setP_portal_username] = useState("");
   const [p_pwd, setP_pwd] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  // const router = useRouter();
-
+  const { setLoading } = useLoadingProvider();
+  const theme = useTheme();
+    
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Llamada a NextAuth.js para autenticar
+    e.preventDefault();
+    setLoading(true);
     const result = await login(p_portal_username, p_pwd);
     if (result.status === 400) {
-      alert("falla autenticacion"); // Muestra un mensaje de error si la autenticación falla
+      alert("falla autenticacion");
+      setLoading(false);
     } else {
+      setLoading(false);
       sessionStorage.setItem("PROFILE_KEY", JSON.stringify(result.user));
-      window.location.href = "/dashboard/solicitud"; // Redirige al usuario a la página principal
+      window.location.href = "/dashboard/solicitud";
     }
   };
 
   return (
-    <div>
-      <Container component="main" maxWidth="xs">
-        <Box
-          sx={{
-            marginTop: 18,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Card
-            elevation={6}
-            sx={{ width: "100%", padding: 3, marginBottom: 3 }}
-          >
-            <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  mb: 2,
-                  marginTop: -7,
+    <Container component="main" maxWidth="sm"> {/* Cambiado a maxWidth="sm" para más ancho */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "90vh",
+          py: 4
+        }}
+      >
+        <Card elevation={6} sx={{ 
+          width: "100%", 
+          maxWidth: 450,  // Ancho personalizado
+          px:4 ,
+          py:0, 
+          borderRadius: 3,
+          boxShadow: theme.shadows[4]
+        }}>
+          <CardContent sx={{ p: 0 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              {/* Logo más grande y optimizado */}
+              <Box sx={{ 
+                width: 200,  // Tamaño aumentado
+                height: 140,
+                position: 'relative',
+                // mb: 2
+              }}>
+                <Image
+                  src="https://oceanicadeseguros.com/static/oceanica_original-1035af5b673858a792c437cf229007bd.png"
+                  alt="Logo de la empresa"
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  priority
+                />
+              </Box>
+              
+              <Typography variant="h5" component="h1" sx={{ 
+                fontWeight: 600,
+                color: '#233748',
+                mb: 1,
+                fontFamily: 'system-ui'
+              }}>
+                Sistema Gestión de APIS
+              </Typography>
+              
+              <Divider sx={{ 
+                width: '80%', 
+                borderColor: theme.palette.divider,
+                borderBottomWidth: 2
+              }} />
+            </Box>
+
+            <Box component="form" onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                value={p_portal_username}
+                onChange={(e) => setP_portal_username(e.target.value)}
+                margin="normal"
+                label="Usuario"
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ mb: 2 }}
+              />
+
+              <TextField
+                fullWidth
+                variant="outlined"
+                type={showPassword ? "text" : "password"}
+                value={p_pwd}
+                onChange={(e) => setP_pwd(e.target.value)}
+                margin="normal"
+                label="Contraseña"
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                        size="small"
+                      >
+                        {showPassword ? 
+                          <VisibilityOff fontSize="small" /> : 
+                          <Visibility fontSize="small" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ mb: 3 }}
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ 
+                  py: 1.5,
+                  fontSize: '1rem',
+                  fontWeight: 400,
+                  textTransform: 'capitalize',
+                  backgroundColor: '#47c0b6',
+                  '&:hover': {
+                    backgroundColor: '#3aa99e',
+                    boxShadow: theme.shadows[2]
+                  },
+                  transition: 'all 0.3s ease'
                 }}
               >
-                <Image
-                  src="https://asesores.segurospiramide.com/static/logo-piramides-d07524ef35db8b8403dff1b54884e9aa.svg" // Ruta del logo (guárdalo en la carpeta public)
-                  alt="Logo de la empresa"
-                  width={200}
-                  height={200}
-                />
-              </Box>
-
-              <Box
-                component="form"
-                sx={{ marginTop: -7 }}
-                onSubmit={handleSubmit}
-              >
-                {/* Campo de email con icono */}
-                <TextField
-                  fullWidth
-                  variant="standard"
-                  type="text"
-                  value={p_portal_username}
-                  onChange={(e) => setP_portal_username(e.target.value)}
-                  margin="normal"
-                  placeholder="Usuario"
-                  required
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PersonIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                {/* Campo de contraseña con icono */}
-                <TextField
-                  fullWidth
-                  variant="standard"
-                  type={showPassword ? "text" : "password"} // Cambia el tipo de input según el estado
-                  value={p_pwd}
-                  onChange={(e) => setP_pwd(e.target.value)}
-                  margin="normal"
-                  placeholder="Clave"
-                  required
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Lock />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={handleClickShowPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                {/* Botón de inicio de sesión */}
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Iniciar sesión
-                </Button>
-                {/* Enlace de inicio de sesión */}
-                <Grid container justifyContent="flex-end">
-                  <Grid item>
-                    <Link
-                      href="https://asesores.segurospiramide.com/register"
-                      variant="body2"
-                    >
-                      ¿No tienes una cuenta? Regístrate
-                    </Link>
-                  </Grid>
+                Iniciar sesión
+              </Button>
+              
+              <Grid container justifyContent="center" sx={{ mt: 3 }}>
+                <Grid item>
+                  <Link
+                    href="https://oceanicadeseguros.com/register"
+                    variant="body2"
+                    color="text.secondary"
+                    underline="hover"
+                    sx={{
+                      '&:hover': {
+                        color: theme.palette.primary.main
+                      }
+                    }}
+                  >
+                    ¿No tienes una cuenta? Regístrate
+                  </Link>
                 </Grid>
-              </Box>
-            </CardContent>
-          </Card>
-        </Box>
-      </Container>
-    </div>
+              </Grid>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+    </Container>
   );
 };
 

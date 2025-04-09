@@ -38,12 +38,32 @@ export const listaValor = {
   ],
 };
 
+// export const listaDesarrollador = {
+//   c_detalle_api: [
+//     {
+//       NOMBRE: "Daniel Nolasco",
+//       PRODUCTO: "DNOLASCO",
+//     },
+//     {
+//       NOMBRE: "Lexfer Ramirez",
+//       PRODUCTO: "LRAMIREZ",
+//     },
+//     {
+//       NOMBRE: "Leonardo Yepez",
+//       PRODUCTO: "LYEPEZ",
+//     },
+//     {
+//       NOMBRE: "Renseld Lugo",
+//       PRODUCTO: "RLUGO",
+//     },
+//   ],
+// };
 
 function useSessionStorage(key) {
   const [value, setValue] = useState(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const item = sessionStorage.getItem(key);
       if (item) {
         setValue(JSON.parse(item));
@@ -58,8 +78,6 @@ const Page = () => {
   const profile = useSessionStorage("PROFILE_KEY");
   const codigoPerfil = profile?.PROFILE_CODE;
 
-   console.log('intermediario' ,codigoPerfil )
-
   const [show, setShow] = useState(false);
   const [dataHistorico, setDataHistorico] = useState({
     c_solicitud: [],
@@ -70,8 +88,11 @@ const Page = () => {
     c_det_solicitud: [],
   });
   const [selectedValues, setSelectedValues] = useState({});
+  const [selectedDevelopers, setSelectedDevelopers] = useState({});
+  const [completedStatuses, setCompletedStatuses] = useState({});
   const [changes, setChanges] = useState([]);
-  const [tabValue, setTabValue] = useState(0); // Estado para controlar el tab activo
+  const [tabValue, setTabValue] = useState(0);
+  const [listaDesarrollador, setListaDesarrollador] = useState({});
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -79,6 +100,21 @@ const Page = () => {
 
   const handleOnClick = () => {
     setShow(true);
+  };
+
+  const allStatusesCompleted = (masterId) => {
+    if (!completedStatuses[masterId]) return false;
+
+    const detalles = dataHistorico.c_det_solicitud.filter(
+      (det) => det.ID_SOLICITUD === masterId
+    );
+
+    const statusEntries = Object.values(completedStatuses[masterId] || {});
+    return (
+      detalles.length > 0 &&
+      statusEntries.length === detalles.length &&
+      statusEntries.every(Boolean)
+    );
   };
 
   const handleSelectChange = (event, rowId) => {
@@ -89,6 +125,17 @@ const Page = () => {
       ...prev,
       [rowId]: newValue,
     }));
+
+    setCompletedStatuses((prev) => {
+      const currentMasterStatus = prev[masterId] || {};
+      return {
+        ...prev,
+        [masterId]: {
+          ...currentMasterStatus,
+          [rowId]: newValue !== "",
+        },
+      };
+    });
 
     setChanges((prev) => {
       const existingChangeIndex = prev.findIndex(
@@ -119,6 +166,13 @@ const Page = () => {
     });
   };
 
+  const handleDeveloperChange = (rowId, value) => {
+    setSelectedDevelopers((prev) => ({
+      ...prev,
+      [rowId]: value,
+    }));
+  };
+
   const handleUpdateClick = async (masterData) => {
     try {
       const detallesActualizados = changes.filter(
@@ -132,15 +186,18 @@ const Page = () => {
       }
 
       const apiPayload = {
-        p_cia: 1,
+        p_cia: 2,
         p_id_solicitud: masterData.ID_SOLICITUD,
         p_estatus: "A",
         arr_apis: detallesActualizados.map((d) => d.CODIGO_API).join("|"),
         arr_apis_sts: detallesActualizados.map((d) => d.ESTATUS).join("|"),
+        p_cod_desarrollador: selectedDevelopers[masterData.ID_SOLICITUD] || "",
       };
 
+      console.log("ver valor final", apiPayload);
+
       const response = await Axios.post(
-        "https://segurospiramide.com/asg-api/dbo/doc_api/sp_Actualizar_solicitud",
+        "https://oceanicadeseguros.com/asg-api/dbo/doc_api/sp_Actualizar_solicitud",
         apiPayload
       );
 
@@ -174,14 +231,15 @@ const Page = () => {
 
   const constDataHistorico = async () => {
     try {
-
-       console.log('ver valor' ,codigoPerfil )
       const params = {
-        p_cia: 1,
-        p_codinter: codigoPerfil === "insurance_broker"? profile.p_insurance_broker_code:  "0",
+        p_cia: 2,
+        p_codinter:
+          codigoPerfil === "insurance_broker"
+            ? profile.p_insurance_broker_code
+            : "0",
       };
       const response = await Axios.post(
-        "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitudes",
+        "https://oceanicadeseguros.com/asg-api/dbo/doc_api/sp_consulta_solicitudes",
         params
       );
       setDataHistorico(
@@ -202,14 +260,15 @@ const Page = () => {
   const constDataHistoricoSolicitudes = async () => {
     try {
       const params = {
-        p_cia: 1,
-        p_codinter: codigoPerfil === "insurance_broker" ? profile.p_insurance_broker_code :  "0",
+        p_cia: 2,
+        p_codinter:
+          codigoPerfil === "insurance_broker"
+            ? profile.p_insurance_broker_code
+            : "0",
       };
-      
-       console.log('ver valor params' ,params )
 
       const response = await Axios.post(
-        "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitudes_hist",
+        "https://oceanicadeseguros.com/asg-api/dbo/doc_api/sp_consulta_solicitudes_hist",
         params
       );
       setDataHistoricoSolicitudes(
@@ -227,22 +286,53 @@ const Page = () => {
     }
   };
 
+  const constDesarrolladores = async () => {
+    try {
+      const response = await Axios.post(
+        "https://oceanicadeseguros.com/asg-api/dbo/doc_api/lista_desarrolladores"
+      );
+      setListaDesarrollador(response.data.c_det_api);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
-    if(codigoPerfil !== undefined){
+    if (codigoPerfil !== undefined) {
       constDataHistorico();
       constDataHistoricoSolicitudes();
+      constDesarrolladores();
     }
   }, [codigoPerfil]);
 
   const transformedData = useMemo(
     () =>
-      dataHistorico.c_solicitud?.map((solicitud) => ({
-        ...solicitud,
-        FECHA: new Date(solicitud.FECHA).toLocaleDateString(),
-        detalles: dataHistorico.c_det_solicitud.filter(
-          (det) => det.ID_SOLICITUD === solicitud.ID_SOLICITUD
-        ),
-      })),
+      dataHistorico.c_solicitud?.map((solicitud) => {
+        if (!completedStatuses[solicitud.ID_SOLICITUD]) {
+          const detalles = dataHistorico.c_det_solicitud.filter(
+            (det) => det.ID_SOLICITUD === solicitud.ID_SOLICITUD
+          );
+
+          const initialStatus = {};
+          detalles.forEach((det) => {
+            const rowId = `${solicitud.ID_SOLICITUD}_${det.NOMBRE}_${det.CODIGO_API}`;
+            initialStatus[rowId] = false;
+          });
+
+          setCompletedStatuses((prev) => ({
+            ...prev,
+            [solicitud.ID_SOLICITUD]: initialStatus,
+          }));
+        }
+
+        return {
+          ...solicitud,
+          FECHA: new Date(solicitud.FECHA).toLocaleDateString(),
+          detalles: dataHistorico.c_det_solicitud.filter(
+            (det) => det.ID_SOLICITUD === solicitud.ID_SOLICITUD
+          ),
+        };
+      }),
     [dataHistorico]
   );
 
@@ -272,8 +362,7 @@ const Page = () => {
 
   const detailColumns = useMemo(
     () => [
-
-       {
+      {
         accessorKey: "NOMBRE",
         header: "Producto",
         size: 200,
@@ -348,6 +437,7 @@ const Page = () => {
     [selectedValues]
   );
 
+
   const detailColumnsHistorico = useMemo(
     () => [
       {
@@ -380,16 +470,16 @@ const Page = () => {
           </span>
         ),
       },
-      {
-        accessorKey: "URL",
-        header: "URL",
-        size: 300,
-        Cell: ({ cell }) => (
-          <a href={cell.getValue()} target="_blank" rel="noopener noreferrer">
-            {cell.getValue()}
-          </a>
-        ),
-      },
+      // {
+      //   accessorKey: "URL",
+      //   header: "URL",
+      //   size: 300,
+      //   Cell: ({ cell }) => (
+      //     <a href={cell.getValue()} target="_blank" rel="noopener noreferrer">
+      //       {cell.getValue()}
+      //     </a>
+      //   ),
+      // },
     ],
     []
   );
@@ -426,51 +516,62 @@ const Page = () => {
           </span>
         ),
       },
-      {
-        accessorKey: "URL",
-        header: "URL",
-        size: 300,
-        Cell: ({ cell }) => (
-          <a href={cell.getValue()} target="_blank" rel="noopener noreferrer">
-            {cell.getValue()}
-          </a>
-        ),
-      },
+      // {
+      //   accessorKey: "URL",
+      //   header: "URL",
+      //   size: 300,
+      //   Cell: ({ cell }) => (
+      //     <a href={cell.getValue()} target="_blank" rel="noopener noreferrer">
+      //       {cell.getValue()}
+      //     </a>
+      //   ),
+      // },
     ],
     []
   );
+
 
   const columns = useMemo(
     () => [
       {
         accessorKey: "ID_SOLICITUD",
-        header: "Nro. Solcitud",
-        size: 120,
+        header: "Nro. Solicitud",
+        size: 80, // Tamaño reducido
+        maxSize: 100, // Tamaño máximo
+        headerAlign: "center", //
       },
       {
         accessorKey: "FECHA",
         header: "Fecha",
-        size: 120,
+        size: 80, // Tamaño reducido
+        maxSize: 100, // Tamaño máximo
+        headerAlign: "center", //
       },
       {
         accessorKey: "CONTACTO",
         header: "Contacto",
-        size: 180,
+        size: 80, // Tamaño reducido
+        maxSize: 100, // Tamaño máximo
+        headerAlign: "center", //
       },
       {
         accessorKey: "EMAIL",
         header: "Email",
-        size: 200,
+        size: 60, // Tamaño reducido
+        maxSize: 80, // Tamaño máximo
+        headerAlign: "center", //
       },
       {
         accessorKey: "TELF_CONTACTO",
         header: "Teléfono",
         size: 120,
+        headerAlign: "center", //
       },
       {
         accessorKey: "ESTATUS",
         header: "Estatus",
-        size: 100,
+        size: 80,
+        headerAlign: "center", //
         Cell: ({ cell }) => (
           <span
             style={{
@@ -492,44 +593,90 @@ const Page = () => {
         ),
       },
       {
+        header: "Desarrollador",
+        size: 150,
+        headerAlign: "center", //
+        Cell: ({ row }) => {
+          const rowId = row.original.ID_SOLICITUD;
+          return (
+            <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+              <Select
+                value={selectedDevelopers[rowId] || ""}
+                onChange={(e) => handleDeveloperChange(rowId, e.target.value)}
+                displayEmpty
+              >
+                <MenuItem value="">
+                  <em>Seleccionar</em>
+                </MenuItem>
+                {listaDesarrollador.map((item, index) => (
+                  <MenuItem key={index} value={item.CODIGO_DESARROLLADOR}>
+                    {item.NOMBRE}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        },
+      },
+      {
         header: "Acción",
         size: 80,
+        headerAlign: "center", //
         Cell: ({ row }) => {
           const hasChanges = changes.some(
             (change) =>
               change.ID_SOLICITUD.toString() ===
               row.original.ID_SOLICITUD.toString()
           );
+
+          const allCompleted = allStatusesCompleted(row.original.ID_SOLICITUD);
+          const detalles = dataHistorico.c_det_solicitud.filter(
+            (det) => det.ID_SOLICITUD === row.original.ID_SOLICITUD
+          );
+          const completedCount = Object.values(
+            completedStatuses[row.original.ID_SOLICITUD] || {}
+          ).filter(Boolean).length;
+
           return (
             <Tooltip
               title={
-                hasChanges
+                !allCompleted
+                  ? `Complete todos los estatus (${completedCount}/${detalles.length})`
+                  : hasChanges
                   ? "Actualizar cambios"
                   : "No hay cambios para actualizar"
               }
             >
-              <Button
-                size="small"
-                variant="contained"
-                color={"inherit"}
-                onClick={() => handleUpdateClick(row.original)}
-                disabled={!hasChanges}
-                sx={{
-                  backgroundColor: hasChanges ? "#eb4215" : "#e0e0e0",
-                  color: hasChanges ? "white" : "#9e9e9e",
-                  "&:hover": {
-                    backgroundColor: hasChanges ? "#c2330e" : "#e0e0e0",
-                  },
-                }}
-              >
-                Actualizar
-              </Button>
+              <span>
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => handleUpdateClick(row.original)}
+                  disabled={!hasChanges || !allCompleted}
+                  sx={{
+                    backgroundColor:
+                      hasChanges && allCompleted ? "#47c0b6" : "#e0e0e0",
+                    color: hasChanges && allCompleted ? "white" : "#9e9e9e",
+                    "&:hover": {
+                      backgroundColor:
+                        hasChanges && allCompleted ? "#47c0b6" : "#e0e0e0",
+                    },
+                  }}
+                >
+                  Actualizar
+                </Button>
+              </span>
             </Tooltip>
           );
         },
       },
     ],
-    [changes]
+    [
+      changes,
+      selectedDevelopers,
+      completedStatuses,
+      dataHistorico.c_det_solicitud,
+    ]
   );
 
   const columnsHistorico = useMemo(
@@ -557,6 +704,11 @@ const Page = () => {
       {
         accessorKey: "TELF_CONTACTO",
         header: "Teléfono",
+        size: 120,
+      },
+      {
+        accessorKey: "NOMBRE",
+        header: "Desarrollador",
         size: 120,
       },
       {
@@ -638,11 +790,9 @@ const Page = () => {
           </span>
         ),
       },
-
     ],
     []
   );
-
 
   const table = useMaterialReactTable({
     columns,
@@ -655,7 +805,7 @@ const Page = () => {
     paginateExpandedRows: true,
     muiTableHeadCellProps: {
       sx: {
-        background: "#eb4215",
+        background: "#47c0b6",
         color: "white",
         fontWeight: "bold",
         fontSize: "0.9rem",
@@ -725,7 +875,7 @@ const Page = () => {
     paginateExpandedRows: true,
     muiTableHeadCellProps: {
       sx: {
-        background: "#eb4215",
+        background: "#47c0b6",
         color: "white",
         fontWeight: "bold",
         fontSize: "0.9rem",
@@ -745,7 +895,7 @@ const Page = () => {
           >
             <thead>
               <tr style={{ backgroundColor: "#f5f5f5" }}>
-                {detailColumnsHistorico.map((column) => (
+                {detailColumnsHistorico?.map((column) => (
                   <th
                     key={column.accessorKey || column.header}
                     style={{
@@ -763,7 +913,7 @@ const Page = () => {
             <tbody>
               {detalles.map((detalle, index) => (
                 <tr key={index}>
-                  {detailColumnsHistorico.map((column) => (
+                  {detailColumnsHistorico?.map((column) => (
                     <td
                       key={column.accessorKey || column.header}
                       style={{
@@ -801,7 +951,7 @@ const Page = () => {
     paginateExpandedRows: true,
     muiTableHeadCellProps: {
       sx: {
-        background: "#eb4215",
+        background: "#47c0b6",
         color: "white",
         fontWeight: "bold",
         fontSize: "0.9rem",
@@ -821,7 +971,7 @@ const Page = () => {
           >
             <thead>
               <tr style={{ backgroundColor: "#f5f5f5" }}>
-                {detailColumnsHistorico.map((column) => (
+                {detailColumnsAsesor?.map((column) => (
                   <th
                     key={column.accessorKey || column.header}
                     style={{
@@ -839,7 +989,7 @@ const Page = () => {
             <tbody>
               {detalles.map((detalle, index) => (
                 <tr key={index}>
-                  {detailColumnsHistorico.map((column) => (
+                  {detailColumnsAsesor?.map((column) => (
                     <td
                       key={column.accessorKey || column.header}
                       style={{
@@ -866,11 +1016,6 @@ const Page = () => {
     },
   });
 
-
-
-
-
-
   return (
     <>
       {!show ? (
@@ -881,7 +1026,6 @@ const Page = () => {
             </Box>
             <Divider />
 
-            {/* Tabs para navegar entre las secciones */}
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs
                 value={tabValue}
@@ -889,7 +1033,7 @@ const Page = () => {
                 aria-label="solicitudes tabs"
                 sx={{
                   "& .MuiTabs-indicator": {
-                    backgroundColor: "#eb4215",
+                    backgroundColor: "#47c0b6",
                   },
                 }}
               >
@@ -898,14 +1042,19 @@ const Page = () => {
               </Tabs>
             </Box>
 
-            {codigoPerfil === "insurance_broker" && (
+            {codigoPerfil === "insurance_broker" && tabValue === 0 && (
               <Grid container justifyContent="flex-end">
                 <Grid item>
                   <Button
-                    size="small"
                     variant="contained"
-                    sx={{ m: 3 }}
-                    color="error"
+                    size="small"
+                    sx={{
+                      m: 3,
+                      backgroundColor: "#47c0b6",
+                      "&:hover": {
+                        backgroundColor: "#3aa99e",
+                      },
+                    }}
                     onClick={handleOnClick}
                   >
                     Nueva Solicitud
@@ -914,9 +1063,14 @@ const Page = () => {
               </Grid>
             )}
 
-            {/* Contenido de cada tab */}
             <Box>
-              {tabValue === 0 && <MaterialReactTable table={ codigoPerfil !== "insurance_broker" ? table: tableAsesor} />}
+              {tabValue === 0 && (
+                <MaterialReactTable
+                  table={
+                    codigoPerfil !== "insurance_broker" ? table : tableAsesor
+                  }
+                />
+              )}
               {tabValue === 1 && (
                 <MaterialReactTable table={tableHistoricoSolicitudes} />
               )}
@@ -924,7 +1078,11 @@ const Page = () => {
           </Card>
         </Container>
       ) : (
-        <FormSolicitud show={show} setShow={setShow}/>
+        <FormSolicitud
+          show={show}
+          setShow={setShow}
+          constDataHistorico={constDataHistorico}
+        />
       )}
     </>
   );

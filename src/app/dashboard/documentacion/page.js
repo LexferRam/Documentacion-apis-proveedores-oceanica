@@ -58,14 +58,14 @@ const page = () => {
 
   const handleBroker = async (value) => {
     const params = {
-      p_cia: 1,
+      p_cia: 2,
       p_codinter:
         codigoPerfil === "insurance_broker"
           ? profile.p_insurance_broker_code
           : value,
     };
     const response = await Axios.post(
-      "https://segurospiramide.com/asg-api/dbo/doc_api/sp_consulta_solicitud_asesor",
+      "https://oceanicadeseguros.com/asg-api/dbo/doc_api/sp_consulta_solicitud_asesor",
       params
     );
     setConsultaApi(response.data.c_det_solicitud);
@@ -184,7 +184,7 @@ const page = () => {
     paginateExpandedRows: true, //When rows are expanded, do not count sub-rows as number of rows on the page towards pagination
     muiTableHeadCellProps: {
       sx: {
-        background: "#eb4215",
+        background: "#47c0b6",
         color: "white",
         fontWeight: "bold",
         fontSize: "0.9rem",

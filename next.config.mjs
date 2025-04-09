@@ -14,7 +14,10 @@ const nextConfig = {
     //BASE_URL : "https://segurospiramide.com/asg-api",
     //BASE_URL_QR : "https://segurospiramide.com",
     COMPANY : 'OCEANICA'
-  }
+  },
+  images: {
+    domains: ['oceanicadeseguros.com']
+}
 };
 
 export default nextConfig;
