@@ -21,6 +21,20 @@ import React, { useEffect, useState } from "react";
 import { Send, Clear } from "@mui/icons-material";
 import Axios from "axios";
 import { useLoadingProvider } from "@/context/LoadingContext";
+import { IMaskInput } from 'react-imask'; // Import IMaskInput
+
+const TextMaskCustom = React.forwardRef(function TextMaskCustom(props, ref) {
+  return (
+    <IMaskInput
+      {...props}
+      inputRef={ref} // Use inputRef instead of ref for IMaskInput
+      mask={[
+        { mask: '0000-0000000' },
+        { mask: '0000-0000000' }, // Added another mask for the second format
+      ]}
+    />
+  );
+});
 
 function useSessionStorage(key) {
   const [value, setValue] = useState(null);
@@ -52,7 +66,7 @@ const FormSolicitud = ({ show, setShow, constDataHistorico }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [listaValores, setListaValores] = useState([]); // Cambiado a array vacío
-  
+
   const { setLoading } = useLoadingProvider();
   const profile = useSessionStorage("PROFILE_KEY");
   const codigoAsesor = profile?.p_insurance_broker_code;
@@ -62,17 +76,17 @@ const FormSolicitud = ({ show, setShow, constDataHistorico }) => {
       const params = {
         p_cia: 2,
       };
-     
+
       const response = await Axios.post(
         "https://oceanicadeseguros.com/asg-api/dbo/doc_api/sp_api", params);
-      
+
       // Asegurarse que siempre sea un array
-      const datos = Array.isArray(response.data?.c_detalle_api) 
-        ? response.data.c_detalle_api 
+      const datos = Array.isArray(response.data?.c_detalle_api)
+        ? response.data.c_detalle_api
         : [];
-      
+
       setListaValores(datos);
-    
+
     } catch (error) {
       console.error("Error fetching data:", error);
       setListaValores([]); // En caso de error, establecer array vacío
@@ -110,9 +124,9 @@ const FormSolicitud = ({ show, setShow, constDataHistorico }) => {
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       nuevosErrores.email = "Email no válido";
     }
-    if (formData.telefono && !/^[0-9]{7,15}$/.test(formData.telefono)) {
-      nuevosErrores.telefono = "Teléfono no válido";
-    }
+    // if (formData.telefono && !/^(0-\d{7}|04\d{2}-\d{7})$/.test(formData.telefono)) {
+    //   nuevosErrores.telefono = "Teléfono no válido. Formato: 0212-XXXXXXX o 04XX-XXXXXXX";
+    // }
     if (formData.productosSeleccionados.length === 0) {
       nuevosErrores.productosSeleccionados = "Seleccione al menos un producto";
     }
@@ -270,6 +284,9 @@ const FormSolicitud = ({ show, setShow, constDataHistorico }) => {
                 error={!!errores.telefono}
                 helperText={errores.telefono}
                 margin="normal"
+                InputProps={{
+                  inputComponent: TextMaskCustom,
+                }}
               />
             </Grid>
 

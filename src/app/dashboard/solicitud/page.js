@@ -24,7 +24,7 @@ import {
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import FormSolicitud from "./_componentes/formSolicitud";
 import Axios from "axios";
-
+import { useLoadingProvider } from "@/context/LoadingContext";
 export const listaValor = {
   c_detalle_api: [
     {
@@ -93,6 +93,7 @@ const Page = () => {
   const [changes, setChanges] = useState([]);
   const [tabValue, setTabValue] = useState(0);
   const [listaDesarrollador, setListaDesarrollador] = useState({});
+  const { setLoading } = useLoadingProvider();
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -175,6 +176,7 @@ const Page = () => {
 
   const handleUpdateClick = async (masterData) => {
     try {
+      setLoading(true)
       const detallesActualizados = changes.filter(
         (change) =>
           change.ID_SOLICITUD.toString() === masterData.ID_SOLICITUD.toString()
@@ -202,6 +204,7 @@ const Page = () => {
       );
 
       if (response.status === 200) {
+        setLoading(false)
         setDataHistorico({
           c_solicitud: [],
           c_det_solicitud: [],
@@ -220,6 +223,7 @@ const Page = () => {
           )
         );
         alert("Actualización exitosa");
+        
       } else {
         throw new Error(response.data.message);
       }
